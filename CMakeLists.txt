@@ -1,0 +1,60 @@
+cmake_minimum_required(VERSION 3.16)
+project(cpp_search_engine VERSION 1.0.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+option(SE_BUILD_TESTS "Build unit tests" ON)
+option(SE_BUILD_BENCHMARKS "Build benchmark executables" ON)
+option(SE_SANITIZE "Enable address and undefined behaviour sanitizers" OFF)
+option(SE_NATIVE "Compile with -march=native" OFF)
+
+find_package(Threads REQUIRED)
+
+file(GLOB SE_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+list(FILTER SE_SOURCES EXCLUDE REGEX ".*/main\\.cpp$")
+
+add_library(se_core STATIC ${SE_SOURCES})
+target_include_directories(se_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_link_libraries(se_core PUBLIC Threads::Threads)
+target_compile_options(se_core PUBLIC -Wall -Wextra -Wpedantic -ffp-contract=off)
+
+if(SE_NATIVE)
+  target_compile_options(se_core PUBLIC -march=native)
+endif()
+
+if(SE_SANITIZE)
+  target_compile_options(se_core PUBLIC -fsanitize=address,undefined -fno-omit-frame-pointer)
+  target_link_options(se_core PUBLIC -fsanitize=address,undefined)
+endif()
+
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
+  add_executable(search_engine src/main.cpp)
+  target_link_libraries(search_engine PRIVATE se_core)
+endif()
+
+if(SE_BUILD_TESTS)
+  enable_testing()
+  file(GLOB SE_TEST_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_*.cpp)
+  foreach(test_source ${SE_TEST_SOURCES})
+    get_filename_component(test_name ${test_source} NAME_WE)
+    add_executable(${test_name} ${test_source} tests/main_runner.cpp)
+    target_include_directories(${test_name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+    target_link_libraries(${test_name} PRIVATE se_core)
+    add_test(NAME ${test_name} COMMAND ${test_name})
+  endforeach()
+endif()
+
+if(SE_BUILD_BENCHMARKS)
+  file(GLOB SE_BENCH_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/benchmarks/benchmark_*.cpp)
+  foreach(bench_source ${SE_BENCH_SOURCES})
+    get_filename_component(bench_name ${bench_source} NAME_WE)
+    add_executable(${bench_name} ${bench_source})
+    target_link_libraries(${bench_name} PRIVATE se_core)
+  endforeach()
+endif()
