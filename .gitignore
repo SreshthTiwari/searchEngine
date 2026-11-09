@@ -1,0 +1,15 @@
+build/
+cmake-build-*/
+.vscode/
+.idea/
+.DS_Store
+*.bin
+*.idx
+*.tmp
+__pycache__/
+data/*
+!data/README.md
+!data/sample/
+results/*
+!results/.gitkeep
+!results/README.md
