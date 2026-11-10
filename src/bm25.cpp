@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 
+#include "compressed_index.h"
+
 namespace se {
 
 Bm25Model::Bm25Model(const IndexCore& core, Bm25Params params) : params_(params) {
@@ -67,5 +69,10 @@ template std::vector<SearchHit> exhaustive_search<InvertedIndex>(const InvertedI
                                                                  std::span<const std::uint32_t>, std::size_t,
                                                                  ExhaustiveScratch&, QueryStats*);
 template std::vector<double> compute_upper_bounds<InvertedIndex>(const InvertedIndex&, const Bm25Model&);
+
+template std::vector<SearchHit> exhaustive_search<CompressedIndex>(const CompressedIndex&, const Bm25Model&,
+                                                                   std::span<const std::uint32_t>, std::size_t,
+                                                                   ExhaustiveScratch&, QueryStats*);
+template std::vector<double> compute_upper_bounds<CompressedIndex>(const CompressedIndex&, const Bm25Model&);
 
 }
