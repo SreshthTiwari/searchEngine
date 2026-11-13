@@ -1,0 +1,10 @@
+1	Machine learning basics	Machine learning algorithms learn patterns from data and improve with experience.
+2	Deep learning	Deep learning is a subset of machine learning that uses multi-layer neural networks.
+3	Tomato soup	A simple recipe for tomato soup with fresh basil and garlic.
+4	Sorting algorithms	Efficient algorithms for sorting and searching data include quicksort and binary search.
+5	Inverted indexes	An inverted index maps each term to the list of documents that contain it, enabling fast full-text search.
+6	BM25 ranking	BM25 is a ranking function that scores documents using term frequency, inverse document frequency and length normalization.
+7	Gardening	Tomatoes grow best in full sun with regular watering and rich soil.
+8	Compression	Variable-byte encoding compresses integers, and delta encoding makes sorted document ids small.
+9	Parallel computing	Multithreaded programs split work across cores to improve throughput.
+10	Efficient search	Efficient machine learning systems need fast retrieval of relevant documents.

@@ -38,6 +38,13 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
   target_link_libraries(search_engine PRIVATE se_core)
 endif()
 
+if(SE_BUILD_TESTS AND TARGET search_engine)
+  enable_testing()
+  add_test(NAME cli_smoke
+           COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/tests/cli_smoke.sh $<TARGET_FILE:search_engine>
+                   ${CMAKE_CURRENT_SOURCE_DIR}/data/sample)
+endif()
+
 if(SE_BUILD_TESTS)
   enable_testing()
   file(GLOB SE_TEST_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/test_*.cpp)
