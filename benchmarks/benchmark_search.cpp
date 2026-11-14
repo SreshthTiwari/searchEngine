@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
         const std::size_t max_queries = args.get_size("max-queries", 0);
         if (k == 0 || repeats == 0) throw std::invalid_argument("--k and --repeats must be at least 1");
 
-        const auto docs = se::load_documents(input);
+        auto docs = se::load_documents(input);
         auto queries_full = se::load_queries(args.require("queries"));
         if (max_queries > 0 && queries_full.size() > max_queries) queries_full.resize(max_queries);
         std::vector<std::string> queries;
@@ -113,8 +113,10 @@ int main(int argc, char** argv) {
         for (std::size_t i = 0; i < sizes.size(); ++i) {
             const std::size_t size = sizes[i];
             if (size == 0 || size > docs.size()) throw std::invalid_argument("size out of range: " + std::to_string(size));
-            const std::vector<se::Document> subset(docs.begin(), docs.begin() + static_cast<std::ptrdiff_t>(size));
-            Engines engines = make_engines(subset, threads);
+            Engines engines = [&] {
+                const std::vector<se::Document> subset(docs.begin(), docs.begin() + static_cast<std::ptrdiff_t>(size));
+                return make_engines(subset, threads);
+            }();
             total_mismatches += measure_engine(engines.plain, label, size, queries, k, warmup, repeats, latency);
             total_mismatches += measure_engine(engines.compressed, label, size, queries, k, warmup, repeats, latency);
 

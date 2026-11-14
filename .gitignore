@@ -12,4 +12,5 @@ data/*
 !data/sample/
 results/*
 !results/.gitkeep
-!results/README.md
+!results/*.csv
+!results/charts/
