@@ -1,0 +1,13 @@
+dataset,documents,terms,postings,threads,run,load_seconds,build_seconds,docs_per_second,peak_rss_after_load_mb,peak_rss_after_build_mb,hardware
+msmarco_1m,1000000,457478,40159945,1,1,0.168,5.1542,194015.2,501.3,1524.5,"Apple M5, 10 hardware threads"
+msmarco_1m,1000000,457478,40159945,1,2,0.156,5.1547,193997.6,501.2,1524.5,"Apple M5, 10 hardware threads"
+msmarco_1m,1000000,457478,40159945,1,3,0.160,5.1522,194090.3,501.3,1524.6,"Apple M5, 10 hardware threads"
+msmarco_1m,1000000,457478,40159945,2,1,0.162,2.8524,350580.0,501.3,1547.3,"Apple M5, 10 hardware threads"
+msmarco_1m,1000000,457478,40159945,2,2,0.168,2.9167,342854.5,501.2,1547.0,"Apple M5, 10 hardware threads"
+msmarco_1m,1000000,457478,40159945,2,3,0.170,2.8425,351804.4,501.2,1547.1,"Apple M5, 10 hardware threads"
+msmarco_1m,1000000,457478,40159945,4,1,0.170,1.6763,596543.8,501.3,1579.5,"Apple M5, 10 hardware threads"
+msmarco_1m,1000000,457478,40159945,4,2,0.170,1.7186,581859.8,501.3,1579.1,"Apple M5, 10 hardware threads"
+msmarco_1m,1000000,457478,40159945,4,3,0.164,1.7394,574912.8,501.3,1579.6,"Apple M5, 10 hardware threads"
+msmarco_1m,1000000,457478,40159945,8,1,0.178,1.3730,728321.8,501.3,1628.1,"Apple M5, 10 hardware threads"
+msmarco_1m,1000000,457478,40159945,8,2,0.173,1.4312,698691.8,501.3,1627.9,"Apple M5, 10 hardware threads"
+msmarco_1m,1000000,457478,40159945,8,3,0.158,1.4166,705907.3,501.3,1628.5,"Apple M5, 10 hardware threads"

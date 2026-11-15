@@ -14,3 +14,4 @@ results/*
 !results/.gitkeep
 !results/*.csv
 !results/charts/
+build-*/

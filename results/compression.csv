@@ -1,0 +1,6 @@
+dataset,documents,terms,postings,uncompressed_file_mb,compressed_file_mb,uncompressed_postings_mb,compressed_postings_mb,uncompressed_bytes_per_posting,compressed_bytes_per_posting,compression_ratio,encode_seconds,decode_seconds,encode_mpostings_per_s,decode_mpostings_per_s,encode_mb_per_s,decode_mb_per_s,roundtrip_verified,repeats,hardware
+msmarco_1m,10000,37507,401696,5.340,3.763,3.065,1.202,8.000,3.139,2.549,0.0039,0.0010,101.87,391.56,777.2,2987.4,yes,5,"Apple M5, 10 hardware threads"
+msmarco_1m,50000,87819,2008400,25.275,15.956,15.323,5.334,8.000,2.785,2.873,0.0134,0.0047,150.24,427.95,1146.2,3265.0,yes,5,"Apple M5, 10 hardware threads"
+msmarco_1m,100000,127746,4008902,49.798,30.521,30.585,10.334,8.000,2.703,2.960,0.0224,0.0091,179.21,438.23,1367.2,3343.5,yes,5,"Apple M5, 10 hardware threads"
+msmarco_1m,500000,310544,20071563,244.409,143.142,153.134,49.498,8.000,2.586,3.094,0.0911,0.0438,220.22,458.27,1680.2,3496.3,yes,5,"Apple M5, 10 hardware threads"
+msmarco_1m,1000000,457478,40159945,486.568,281.558,306.396,97.896,8.000,2.556,3.130,0.1991,0.0863,201.71,465.33,1538.9,3550.2,yes,5,"Apple M5, 10 hardware threads"
