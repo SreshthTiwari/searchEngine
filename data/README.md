@@ -1,6 +1,6 @@
 # Data
 
-Nothing in this directory is committed except this file and `sample/`, a tiny hand-written collection used by the smoke test and the quick-start in the top-level README.
+Nothing in this directory is committed except this file and `sample/`, a tiny hand-written collection used by the smoke test and the quick-start in `description.md`.
 
 ## File formats
 
