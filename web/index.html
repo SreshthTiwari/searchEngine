@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Search Engine</title>
+<style>
+  :root {
+    --bg: #fcfcfb;
+    --card: #ffffff;
+    --text: #0b0b0b;
+    --muted: #52514e;
+    --line: #e4e3df;
+    --accent: #2a78d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a19;
+      --card: #232322;
+      --text: #f0efec;
+      --muted: #c3c2b7;
+      --line: #3a3a38;
+      --accent: #3987e5;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 720px; margin: 0 auto; padding: 40px 16px 64px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  p.sub { margin: 0 0 24px; color: var(--muted); }
+  form { display: flex; gap: 8px; }
+  input[type=search] {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    font: inherit;
+    color: var(--text);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+  button {
+    padding: 10px 18px;
+    font: inherit;
+    color: #fff;
+    background: var(--accent);
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  #status { margin: 16px 0; color: var(--muted); font-size: 0.9rem; }
+  .result {
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+  .result h2 { margin: 0 0 4px; font-size: 1rem; }
+  .result p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+  .meta { margin-top: 6px; font-size: 0.8rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Search Engine</h1>
+  <p class="sub">BM25 ranking with WAND top-k retrieval over a compressed inverted index.</p>
+  <form id="form">
+    <input id="q" type="search" placeholder="Search..." autocomplete="off" autofocus aria-label="Search query">
+    <button type="submit">Search</button>
+  </form>
+  <div id="status" role="status"></div>
+  <div id="results"></div>
+</main>
+<script>
+  const form = document.getElementById("form");
+  const input = document.getElementById("q");
+  const statusEl = document.getElementById("status");
+  const resultsEl = document.getElementById("results");
+
+  async function search(query) {
+    resultsEl.textContent = "";
+    if (!query.trim()) {
+      statusEl.textContent = "";
+      return;
+    }
+    statusEl.textContent = "Searching...";
+    try {
+      const response = await fetch("/api/search?k=10&q=" + encodeURIComponent(query));
+      const data = await response.json();
+      if (!response.ok) {
+        statusEl.textContent = data.error || "Request failed";
+        return;
+      }
+      const n = data.results.length;
+      statusEl.textContent = n === 0
+        ? "No matching documents."
+        : n + " result" + (n === 1 ? "" : "s") + " in " + (data.took_us / 1000).toFixed(2) +
+          " ms from " + data.total_documents.toLocaleString() + " documents";
+      data.results.forEach(function (r, i) {
+        const card = document.createElement("div");
+        card.className = "result";
+        const title = document.createElement("h2");
+        title.textContent = r.title || "Document " + r.id;
+        const snippet = document.createElement("p");
+        snippet.textContent = r.snippet;
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = "#" + (i + 1) + " | id " + r.id + " | score " + r.score;
+        card.append(title, snippet, meta);
+        resultsEl.appendChild(card);
+      });
+    } catch (e) {
+      statusEl.textContent = "Could not reach the server.";
+    }
+  }
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    history.replaceState(null, "", "?q=" + encodeURIComponent(input.value));
+    search(input.value);
+  });
+
+  const initial = new URLSearchParams(location.search).get("q");
+  if (initial) {
+    input.value = initial;
+    search(initial);
+  }
+</script>
+</body>
+</html>

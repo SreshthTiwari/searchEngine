@@ -1,4 +1,6 @@
+#include <atomic>
 #include <cerrno>
+#include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
@@ -12,9 +14,11 @@
 #include "compressed_index.h"
 #include "document.h"
 #include "evaluation.h"
+#include "http_server.h"
 #include "index_builder.h"
 #include "search_engine.h"
 #include "storage.h"
+#include "web_api.h"
 
 namespace {
 
@@ -32,6 +36,7 @@ Commands:
   benchmark    Measure query latency on a query file and write a CSV
   evaluate     Compute MRR@k and Recall@k from relevance judgements
   info         Print header information of an index file
+  serve        Serve a simple web page and JSON search API
 
 index options:
   --input PATH          documents file (TSV: id<TAB>text or id<TAB>title<TAB>text, or JSONL)
@@ -63,6 +68,12 @@ evaluate options:
   --index PATH --queries PATH --qrels PATH [--topk N] [--algorithm A]
 
 info options:         --index PATH
+
+serve options:
+  --index PATH          index file
+  --port N              port to listen on                       (default: 8080)
+  --host ADDR           IPv4 address to bind                    (default: 127.0.0.1)
+  --page PATH           HTML page to serve                      (default: web/index.html)
 )";
 
 class Args {
@@ -300,6 +311,35 @@ int run_info(const Args& args) {
     return 0;
 }
 
+std::atomic<se::HttpServer*> g_server{nullptr};
+
+void on_signal(int) {
+    if (se::HttpServer* server = g_server.load()) server->stop();
+}
+
+int run_serve(const Args& args) {
+    const std::size_t port = args.get_size("port", 8080);
+    if (port > 65535) throw UsageError("--port must be between 0 and 65535");
+    const std::string host = args.get("host", "127.0.0.1");
+    auto engine = se::SearchEngine::load(args.require("index"), bm25_params(args));
+    se::WebApi api(engine, args.get("page", "web/index.html"));
+
+    se::HttpServer server([&api](const se::HttpRequest& request) { return api.handle(request); });
+    const std::uint16_t bound = server.listen(host, static_cast<std::uint16_t>(port));
+    g_server.store(&server);
+    std::signal(SIGINT, on_signal);
+    std::signal(SIGTERM, on_signal);
+    std::signal(SIGPIPE, SIG_IGN);
+
+    std::cout << "Serving " << engine.core().num_docs() << " documents at http://" << host << ":" << bound
+              << "/ (Ctrl+C to stop)\n"
+              << std::flush;
+    server.serve();
+    g_server.store(nullptr);
+    std::cout << "Stopped.\n";
+    return 0;
+}
+
 }
 
 int main(int argc, char** argv) {
@@ -326,6 +366,9 @@ int main(int argc, char** argv) {
         }
         if (command == "evaluate") {
             return run_evaluate(Args(argc, argv, 2, {"index", "queries", "qrels", "topk", "algorithm", "k1", "b"}, {}));
+        }
+        if (command == "serve") {
+            return run_serve(Args(argc, argv, 2, {"index", "port", "host", "page", "k1", "b"}, {}));
         }
         if (command == "info") {
             return run_info(Args(argc, argv, 2, {"index"}, {}));
